@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="irrigation.sqlite" uuid="d25d9ec4-5629-4416-b993-5259fc18c7b9">
-      <driver-ref>sqlite.xerial</driver-ref>
+    <data-source source="LOCAL" name="irrigationdb@localhost" uuid="0f01a3dd-83b9-4494-b40a-971c82ee6b4e">
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:identifier.sqlite</jdbc-url>
-      <driver-properties>
-        <property name="enable_load_extension" value="true" />
-      </driver-properties>
+      <remarks>Database for irrigation project</remarks>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/irrigationdb</jdbc-url>
     </data-source>
   </component>
 </project>

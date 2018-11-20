@@ -1,0 +1,15 @@
+create table sensors
+(
+    sensor_id text,
+    configuration text,
+    crop text,
+    bcm_pin integer
+)
+
+create table sensor_readings
+(
+    recorded_at timestamp with time zone default now(),
+    sensor_id text,
+    kPa value
+)
+

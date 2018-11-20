@@ -83,22 +83,16 @@ class MoistureMeter:
                 tstart = datetime.now()
                 total_time_measured = total_time_measured + total_seconds
                 # print("Elapsed Time : ", total_seconds)
+                # calculate average input period over sample time
 
-        # calculate average input period over sample time
+                period = total_time_measured / sample_count
+                # print("calculated period : ", period)
 
-        period = total_time_measured / sample_count
-        # print("calculated period : ", period)
+                frequency = 1 / period
 
-        frequency = 1 / period
+                # print("Frequency is : ", frequency)
+                kPa = self.compute_kpa(frequency)
 
-        # print("Frequency is : ", frequency)
-        kPa = self.compute_kpa(frequency)
-
-        # print("computed kPa is : ",kPa)
-
-        # for f in range(100,6500):
-        #     #print("Test f : ",f)
-        #     kPa = self.compute_kpa(f)
-        #     print("computed kPa: ",kPa)
+                # print("computed kPa is : ",kPa)
 
         return kPa
