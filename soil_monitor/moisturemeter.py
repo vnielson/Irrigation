@@ -65,8 +65,12 @@ class MoistureMeter:
         tstart = datetime.now()
         # print("Time Start : ", tstart)
 
-        sample_count = 20
+        sample_count = 5
         total_time_measured = 0
+        min_frequency = 1000000.0
+        max_frequency = 0.0
+
+        valid_data = True
 
         # now loop, repeatedly looking for rising edge and timing info
         for i in range(1, sample_count):
@@ -75,6 +79,7 @@ class MoistureMeter:
             if channel is None:
                 print('Timeout occurred, abort')
                 kPa = -1
+                valid_data = False
                 break
             else:
                 tend = datetime.now()
@@ -82,17 +87,24 @@ class MoistureMeter:
                 total_seconds = time_delta.total_seconds()
                 tstart = datetime.now()
                 total_time_measured = total_time_measured + total_seconds
+                print("Time delta total seconds: ", time_delta.total_seconds())
+                if time_delta.total_seconds() < min_frequency:
+                    print("new min_frequency", time_delta.total_seconds())
+                    min_frequency = 1 / time_delta.total_seconds()
+
+                if time_delta.total_seconds() > max_frequency:
+                    print("new max_frequency", time_delta.total_seconds())
+                    max_frequency = 1 / time_delta.total_seconds()
+
                 # print("Elapsed Time : ", total_seconds)
-                # calculate average input period over sample time
 
-                period = total_time_measured / sample_count
-                # print("calculated period : ", period)
+        if (valid_data):
+            # Calculate final kPa data
+            period = total_time_measured / sample_count
+            frequency = 1 / period
+            # print("calculated period : ", period)
+            kPa = self.compute_kpa(frequency)
 
-                frequency = 1 / period
+        return_data = {"kPa": kPa, "min_frequency": min_frequency, "max_frequency": max_frequency}
 
-                # print("Frequency is : ", frequency)
-                kPa = self.compute_kpa(frequency)
-
-                # print("computed kPa is : ",kPa)
-
-        return kPa
+        return return_data

@@ -13,9 +13,9 @@ def main():
     for row in sensorinfo:
         nxt_sensor = MM.MoistureMeter(row['sensor_id'], row['bcm_pin'])
         print("get kPa for : ", nxt_sensor.id)
-        sensor_kpa = nxt_sensor.get_kpa_value()
-        print("Got kPa of : ", sensor_kpa)
-        Data.data_access.save_sensor_reading(nxt_sensor.id, sensor_kpa)
+        sensor_reading_data = nxt_sensor.get_kpa_value()
+        print("Return data: ", sensor_reading_data)
+        Data.data_access.save_sensor_reading(nxt_sensor.id, sensor_reading_data)
 
     # Clean up GPIO
     GPIO.cleanup()
