@@ -1,5 +1,5 @@
 from sqlalchemy import (create_engine, Table, Column, Integer, Float,
-                        String, MetaData, DateTime, inspect, DropTable, select)
+                        String, MetaData, DateTime, inspect, select)
 
 
 def drop_all_tables(eng):
@@ -47,9 +47,8 @@ def create_tables(eng):
 
     metadata.create_all(eng)  # Creates the table
 
+# if __name__ == '__main__':
+#   engine = create_engine('postgres:///irrigationdb')
 
-if __name__ == '__main__':
-    engine = create_engine('postgres:///irrigationdb')
-
-    drop_all_tables(engine)
+#  drop_all_tables(engine)
     # create_tables(engine)
