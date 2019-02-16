@@ -23,9 +23,14 @@ def save_sensor_reading(sensor_id, sensor_reading_data):
         meta = MetaData(engine)
         sensor_readings = Table('sensor_readings', meta, autoload=True)
 
+        print("Kpa in save date1: ", sensor_reading_data["kPa"])
+
         ins1 = sensor_readings.insert().values(sensor_id=sensor_id,
                                                kpa_value=sensor_reading_data["kPa"],
+                                               computed_frequency=sensor_reading_data["computed_frequency"],
                                                min_frequency=sensor_reading_data["min_frequency"],
                                                max_frequency=sensor_reading_data["max_frequency"],
+                                               mean_frequency=sensor_reading_data["mean"],
+                                               std_dev=sensor_reading_data["stddev"],
                                                )
         con.execute(ins1)

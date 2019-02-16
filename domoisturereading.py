@@ -17,6 +17,11 @@ def main():
         print("Return data: ", sensor_reading_data)
         Data.data_access.save_sensor_reading(nxt_sensor.id, sensor_reading_data)
 
+        # Test: Plot state data vs. time
+        # nxt_sensor.plot_state_data()
+
+    print("=========== END OF RUN ===========")
+
     # Clean up GPIO
     GPIO.cleanup()
 

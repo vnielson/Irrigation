@@ -3,6 +3,8 @@ from typing import Any, Union
 import RPi.GPIO as GPIO  # import RPi.GPIO module
 from time import sleep  # lets us have a delay
 from datetime import datetime
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class MoistureMeter:
@@ -10,12 +12,15 @@ class MoistureMeter:
         self.id = id
         self.bcmpin = int(bcmpin)
         # set up the pin for input
+        print("GPIO BCM Value is : ", GPIO.BCM)
         GPIO.setmode(GPIO.BCM)  # choose BCM or BOARD
         GPIO.setup(self.bcmpin, GPIO.IN)  # set input pin as an
         print("GPIO Pin " + str(self.bcmpin) + " set as input")
 
     def compute_kpa(self, frequency):
         # function to calculate the kPA value based on the input frequency.
+
+        print("compute_kpa input frequency is : ", frequency)
 
         if frequency > 6430:
             kPa = 0
@@ -65,15 +70,14 @@ class MoistureMeter:
         tstart = datetime.now()
         # print("Time Start : ", tstart)
 
-        sample_count = 5
-        total_time_measured = 0
-        min_frequency = 1000000.0
-        max_frequency = 0.0
+        sample_count = 500
+
+        per_array = np.zeros(sample_count)
 
         valid_data = True
 
         # now loop, repeatedly looking for rising edge and timing info
-        for i in range(1, sample_count):
+        for i in range(0, sample_count):
             channel = GPIO.wait_for_edge(self.bcmpin, GPIO.RISING, timeout=5000)
 
             if channel is None:
@@ -84,27 +88,68 @@ class MoistureMeter:
             else:
                 tend = datetime.now()
                 time_delta = tend - tstart
-                total_seconds = time_delta.total_seconds()
+                # print("Delta for this loop: ",time_delta.total_seconds())
+                per_array[i] = time_delta.total_seconds()
                 tstart = datetime.now()
-                total_time_measured = total_time_measured + total_seconds
-                print("Time delta total seconds: ", time_delta.total_seconds())
-                if time_delta.total_seconds() < min_frequency:
-                    print("new min_frequency", time_delta.total_seconds())
-                    min_frequency = 1 / time_delta.total_seconds()
 
-                if time_delta.total_seconds() > max_frequency:
-                    print("new max_frequency", time_delta.total_seconds())
-                    max_frequency = 1 / time_delta.total_seconds()
-
-                # print("Elapsed Time : ", total_seconds)
+        print("per_array: ", per_array)
 
         if (valid_data):
             # Calculate final kPa data
+            total_time_measured = per_array.sum()
+
             period = total_time_measured / sample_count
             frequency = 1 / period
+
             # print("calculated period : ", period)
             kPa = self.compute_kpa(frequency)
 
-        return_data = {"kPa": kPa, "min_frequency": min_frequency, "max_frequency": max_frequency}
+            # compute some statistics that might help understand how well the system is working
+            min_frequency = 1.0 / per_array.max()
+            max_frequency = 1.0 / per_array.min()
+            mean = 1 / per_array.mean()
+            stddev = 1 / per_array.std()
+
+        return_data = {"kPa": kPa, "computed_frequency": frequency, "min_frequency": min_frequency,
+                       "max_frequency": max_frequency, "mean": mean, "stddev": stddev}
+
+
 
         return return_data
+
+    def plot_state_data(self):
+        print("self.bcmpin is ", self.bcmpin)
+        state = GPIO.input(self.bcmpin)
+        print("State is ", state)
+
+        # start timer to begin measuring
+
+        # print("Time Start : ", tstart)
+
+        sample_count = 500
+
+        time_array = np.zeros(sample_count)
+        state_array = np.zeros(sample_count, dtype=int)
+
+        points = np.arange(-5, 5, 0.01)
+        dx, dy = np.meshgrid(points, points)
+        z = (np.sin(dx) + np.sin(dy))
+        plt.imshow(z)
+        plt.colorbar()
+        plt.title('plot for sin(x)+sin(y)')
+        plt.show()
+
+        valid_data = True
+
+        # now loop, repeatedly looking for rising edge and timing info
+        tstart = datetime.now()
+        for i in range(0, sample_count):
+            state = GPIO.input(self.bcmpin)
+            state_array[i] = state
+            tend = datetime.now()
+            time_delta = tend - tstart
+            time_array[i] = time_delta.total_seconds()
+
+        print(time_array)
+        print(state_array)
+        return
